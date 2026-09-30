@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTEC DIT Component 3 Exam Practice & Self-Assessment Engine</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="h-full text-slate-800 flex flex-col font-sans">
+
+    <!-- Navigation Header -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base tracking-tight leading-none text-white">BTEC DIT Component 3</h1>
+                    <p class="text-xs text-slate-400 font-medium">Effective Digital Working Practices • Offline Exam Engine</p>
+                </div>
+            </div>
+
+            <!-- Stats & Teacher Toggle Controls -->
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-4 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
+                    <div>
+                        <span class="text-slate-400">Attempted:</span>
+                        <span id="statAttempted" class="font-bold text-cyan-400 ml-1">0</span>
+                    </div>
+                    <div class="h-3 w-px bg-slate-700"></div>
+                    <div>
+                        <span class="text-slate-400">Avg Score:</span>
+                        <span id="statAvgScore" class="font-bold text-emerald-400 ml-1">0%</span>
+                    </div>
+                </div>
+
+                <button id="toggleModeBtn" onclick="toggleTeacherMode()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span id="modeBtnText">Teacher Mode: OFF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar: Question Filters & Bank -->
+        <aside class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col h-[calc(100vh-6rem)] sticky top-20">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-cyan-600"></i>
+                    Question Bank
+                </h2>
+                <span id="questionCountBadge" class="bg-cyan-100 text-cyan-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="py-3 space-y-2.5 border-b border-slate-100">
+                <!-- Mark Tariff Filter Buttons -->
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Filter by Marks</label>
+                    <div class="grid grid-cols-6 gap-1">
+                        <button onclick="setMarkFilter('ALL')" class="mark-filter-btn active py-1 text-xs font-bold rounded bg-slate-900 text-white hover:bg-slate-800 transition">ALL</button>
+                        <button onclick="setMarkFilter('1')" class="mark-filter-btn py-1 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">1M</button>
+                        <button onclick="setMarkFilter('2')" class="mark-filter-btn py-1 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">2M</button>
+                        <button onclick="setMarkFilter('3')" class="mark-filter-btn py-1 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">3M</button>
+                        <button onclick="setMarkFilter('4')" class="mark-filter-btn py-1 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">4M</button>
+                        <button onclick="setMarkFilter('6')" class="mark-filter-btn py-1 text-xs font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">6M</button>
+                    </div>
+                </div>
+
+                <!-- Paper & Topic Selectors -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Exam Series</label>
+                        <select id="paperSelect" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg p-1.5 focus:ring-2 focus:ring-cyan-500 focus:outline-none font-medium">
+                            <option value="ALL">All Papers</option>
+                            <option value="Jan-2025">Jan 2025 Paper</option>
+                            <option value="June-2024">June 2024 Paper</option>
+                            <option value="Jan-2024">Jan 2024 Paper</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">Topic</label>
+                        <select id="topicSelect" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg p-1.5 focus:ring-2 focus:ring-cyan-500 focus:outline-none font-medium">
+                            <option value="ALL">All Topics</option>
+                            <option value="Modern Technologies">Modern Tech & Cloud</option>
+                            <option value="Communication">Communication</option>
+                            <option value="Project Planning">Project Planning & Flowcharts</option>
+                            <option value="UI & Forms">UI & Web Forms</option>
+                            <option value="Security & Threats">Security & Cyber Threats</option>
+                            <option value="Legal & Ethical">Legal, Ethical & Data</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search scenario or question terms..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-lg pl-8 pr-3 py-1.5 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Question List Scroll Container -->
+            <div id="questionsList" class="flex-1 overflow-y-auto space-y-2 pr-1 pt-2">
+                <!-- Dynamically populated -->
+            </div>
+        </aside>
+
+        <!-- Main Workspace Pane -->
+        <main class="lg:col-span-8 flex flex-col space-y-4">
+            
+            <!-- Question & Scenario Workspace Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative">
+                <!-- Badges Row -->
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <span id="qPaperBadge" class="bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-md">Jan 2025</span>
+                        <span id="qNumBadge" class="bg-cyan-100 text-cyan-800 text-xs font-bold px-2.5 py-1 rounded-md">Q1(a)</span>
+                        <span id="qTopicBadge" class="bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-md">Topic</span>
+                    </div>
+                    <span id="qMarksBadge" class="bg-purple-100 text-purple-800 text-xs font-extrabold px-3 py-1 rounded-full">2 MARKS</span>
+                </div>
+
+                <!-- Scenario Section -->
+                <div class="mb-4 bg-slate-50 border-l-4 border-cyan-500 p-4 rounded-r-xl">
+                    <h3 class="text-xs font-bold text-cyan-900 uppercase tracking-wider mb-1">
+                        <i class="fa-solid fa-file-contract mr-1"></i> Scenario Context
+                    </h3>
+                    <p id="scenarioText" class="text-slate-700 text-xs sm:text-sm leading-relaxed italic">
+                        Select a question from the sidebar to start practicing.
+                    </p>
+                </div>
+
+                <!-- Visual Aid Diagram Container (DFD, Gantt, Form) -->
+                <div id="visualAidContainer" class="hidden mb-4 bg-slate-900 rounded-xl p-4 border border-slate-800">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider">
+                            <i class="fa-solid fa-chart-diagram mr-1"></i> Visual Diagram Context
+                        </span>
+                        <span id="visualTypeLabel" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">Diagram</span>
+                    </div>
+                    <div id="visualAidContent" class="overflow-x-auto flex justify-center py-2">
+                        <!-- Dynamic visual component -->
+                    </div>
+                </div>
+
+                <!-- Question Prompt -->
+                <div class="mb-4">
+                    <h2 id="questionText" class="text-slate-900 font-bold text-sm sm:text-base leading-snug">
+                        Question wording will appear here.
+                    </h2>
+                </div>
+
+                <!-- Dynamic Command Word Answer Box Tip -->
+                <div id="answer-box-tip"></div>
+
+                <!-- Writing Guidance Banner -->
+                <div id="writingTip" class="mb-2 text-xs text-slate-500 font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i> Tip: Use Pearson keywords and full justifications.
+                </div>
+
+                <!-- Answer Textarea Input -->
+                <div class="relative">
+                    <textarea id="studentAnswer" rows="5" placeholder="Type your response here..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3.5 text-xs sm:text-sm text-slate-800 font-sans focus:ring-2 focus:ring-cyan-500 focus:bg-white focus:outline-none transition leading-relaxed"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <span id="charCounter" class="text-[11px] text-slate-400 font-mono">0 characters</span>
+                        <div class="flex gap-2">
+                            <button onclick="clearAnswer()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition">
+                                Clear
+                            </button>
+                            <button onclick="evaluateAnswer()" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-700 text-white shadow-md hover:shadow-lg transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-check"></i> Check Response & Mark Scheme
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback & Interactive Self-Assessment Card -->
+            <div id="feedbackCard" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6 transition duration-300">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div id="scoreBadgeIcon" class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Self-Assessment & Key Term Breakdown</h3>
+                            <p class="text-[11px] text-slate-500">Check off the points present in your response</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Awarded Score</span>
+                        <span id="awardedScore" class="font-black text-xl text-cyan-700">0 / 0</span>
+                    </div>
+                </div>
+
+                <!-- Scanner Commentary -->
+                <div id="aiFeedbackComment" class="mb-4 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed font-medium">
+                    Key term scanning detected points matching the mark scheme below.
+                </div>
+
+                <!-- Interactive Checklist -->
+                <div class="mb-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                        Mark Scheme Criteria Checklist
+                    </label>
+                    <div id="criteriaMatchList" class="space-y-2 text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Forbidden / Do Not Accept Warning Box -->
+                <div id="doNotAcceptContainer" class="hidden mb-4 bg-rose-50 border border-rose-200 p-3 rounded-xl text-rose-800 text-xs">
+                    <div class="font-bold flex items-center gap-1.5 mb-1">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Pearson 'Do Not Accept' Rule
+                    </div>
+                    <p id="doNotAcceptText" class="leading-relaxed"></p>
+                </div>
+
+                <!-- Exemplar Accordion Section -->
+                <div class="border-t border-slate-100 pt-3">
+                    <button onclick="toggleExemplar()" class="w-full flex items-center justify-between text-xs font-bold text-slate-700 hover:text-cyan-700 py-1 transition">
+                        <span><i class="fa-solid fa-award text-amber-500 mr-1.5"></i> View Official Model Exemplar Answer</span>
+                        <i id="exemplarChevron" class="fa-solid fa-chevron-down transition-transform"></i>
+                    </button>
+                    <div id="exemplarContent" class="hidden mt-2 p-3.5 bg-amber-50/60 border border-amber-200/80 rounded-xl text-xs text-slate-800 leading-relaxed font-sans">
+                        <div class="font-bold text-amber-900 mb-1 text-[11px] uppercase tracking-wider">Official Pearson Exemplar</div>
+                        <p id="exemplarText" class="whitespace-pre-line"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher Direct Reveal Controls -->
+            <div id="teacherDirectControls" class="hidden bg-amber-50 border border-amber-300 p-4 rounded-2xl flex items-center justify-between text-xs">
+                <div>
+                    <span class="font-bold text-amber-900 block">Teacher Mode Active</span>
+                    <span class="text-amber-800">Directly display mark scheme and exemplar answers without writing a response.</span>
+                </div>
+                <button onclick="revealTeacherMarkScheme()" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold shadow transition">
+                    Reveal Mark Scheme
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        /**
+         * Command Word Definitions for BTEC DIT
+         */
+        const COMMAND_WORD_TIPS = {
+            identify: {
+                title: "Identify / State",
+                badgeClass: "bg-blue-100 text-blue-800",
+                tip: "💡 <strong>Identify Tip:</strong> Give a brief, direct answer or name the specific item/feature required without extra detail."
+            },
+            describe: {
+                title: "Describe",
+                badgeClass: "bg-purple-100 text-purple-800",
+                tip: "💡 <strong>Describe Tip:</strong> State the key feature or point and provide specific details or characteristics of what it is or how it works. <em>(Feature + Detail — no need for 'because' or cause-and-effect justification).</em>"
+            },
+            explain: {
+                title: "Explain",
+                badgeClass: "bg-emerald-100 text-emerald-800",
+                tip: "💡 <strong>Explain Tip:</strong> State a point and justify it by giving a cause, reason, or consequence. Use connecting phrases like <em>'because'</em>, <em>'this means that'</em>, or <em>'leading to'</em>."
+            },
+            discuss: {
+                title: "Discuss",
+                badgeClass: "bg-amber-100 text-amber-800",
+                tip: "💡 <strong>Discuss Tip:</strong> Explore different perspectives, advantages, disadvantages, and impacts on users or businesses."
+            },
+            evaluate: {
+                title: "Evaluate",
+                badgeClass: "bg-rose-100 text-rose-800",
+                tip: "💡 <strong>Evaluate Tip:</strong> Weigh up the strengths and weaknesses of options or scenarios and provide a justified final conclusion or recommendation."
+            }
+        };
+
+        /**
+         * Generates writing guidance matching BOTH command word and mark tariff
+         */
+        function getWritingTip(q) {
+            const cmd = (q.commandWord || '').toLowerCase();
+            const marks = q.marks;
+
+            if (cmd === 'identify' || cmd === 'state') {
+                return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>${marks} Mark Question:</strong> State or identify a single precise term, tool, or fact.`;
+            }
+
+            if (cmd === 'describe') {
+                if (marks === 2) {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>2 Mark Describe:</strong> State 1 key feature (1 mark) + give specific details/characteristics (1 mark).`;
+                } else if (marks === 3) {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>3 Mark Describe:</strong> State a key threat/issue (1 mark) + describe specific operational details (2 marks).`;
+                } else if (marks === 4) {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>4 Mark Describe:</strong> State 2 key features (1 mark each) + give specific details/characteristics for each (1 mark each).`;
+                } else {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>${marks} Mark Describe:</strong> State key feature(s) and provide relevant details or characteristics.`;
+                }
+            }
+
+            if (cmd === 'explain') {
+                if (marks === 2) {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>2 Mark Explain:</strong> State 1 point (1 mark) + justify/expand using <em>'because'</em> or <em>'this means that'</em> (1 mark).`;
+                } else if (marks === 3) {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>3 Mark Explain:</strong> State 1 point (1 mark) + provide 2 developed linked explanations/consequences (2 marks).`;
+                } else if (marks === 4) {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>4 Mark Explain:</strong> State 2 distinct points (1 mark each), each with a developed justification/consequence (1 mark each).`;
+                } else {
+                    return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>${marks} Mark Explain:</strong> State point(s) and fully justify using cause-and-effect reasons.`;
+                }
+            }
+
+            if (cmd === 'discuss') {
+                return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>6 Mark Discuss:</strong> Provide balanced arguments covering both positive and negative impacts, plus a reasoned conclusion.`;
+            }
+
+            if (cmd === 'evaluate') {
+                return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>6 Mark Evaluate:</strong> Weigh up strengths and weaknesses of options and provide a justified final recommendation.`;
+            }
+
+            return `<i class="fa-solid fa-lightbulb text-amber-500"></i> <strong>${marks} Mark Question:</strong> Ensure your answer addresses the command word and mark tariff in full.`;
+        }
+
+        /**
+         * Question Bank: Transcribed from January 2025, June 2024, and January 2024 Pearson DIT Papers
+         */
+        const examQuestions = [
+            // ==================== JANUARY 2025 PAPER ====================
+            {
+                id: "jan2025-q1a",
+                paper: "Jan-2025",
+                questionNumber: "1(a)",
+                marks: 2,
+                commandWord: "describe",
+                topic: "Modern Technologies",
+                scenario: "Oakfield High School is upgrading its ICT infrastructure. Teachers currently store all teaching materials on local hard drives inside their individual classroom PCs.",
+                question: "Describe one advantage for teachers of storing files in cloud storage rather than on local hard drives.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Point: Files can be accessed remotely from any device with an internet connection.",
+                        "Expansion: Allowing teachers to work from home or in different classrooms without needing physical USB flash drives."
+                    ],
+                    doNotAccept: "Do not accept vague answers like 'it is cheaper' or 'it is easier'. Must reference remote accessibility or device independence.",
+                    exemplar: "Teachers can access their lesson files from any device with internet access (1), meaning they can seamlessly transition between different classrooms or work from home without needing physical storage devices like USB drives (1)."
+                }
+            },
+            {
+                id: "jan2025-q1b",
+                paper: "Jan-2025",
+                questionNumber: "1(b)",
+                marks: 1,
+                commandWord: "identify",
+                topic: "Security & Threats",
+                scenario: "A staff member at Oakfield High School receives an email claiming to be from the IT Support team requesting an immediate password reset via a link provided.",
+                question: "Identify the type of security threat described in the scenario.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Phishing (or Phishing email / Social engineering)"
+                    ],
+                    doNotAccept: "Do not accept general terms like 'Hacking' or 'Virus' or 'Malware'.",
+                    exemplar: "Phishing"
+                }
+            },
+            {
+                id: "jan2025-q2a",
+                paper: "Jan-2025",
+                questionNumber: "2(a)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Communication",
+                scenario: "BrightSpark Logistics wants to improve communication between remote delivery drivers and the central dispatch team. They are deciding between email and an instant messaging application.",
+                question: "Explain two reasons why BrightSpark Logistics should choose an instant messaging platform over email for real-time driver updates.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Reason 1: Instant notifications allow real-time alert delivery so drivers receive route updates immediately.",
+                        "Reason 1 Justification: Leading to faster response times and avoiding traffic delays.",
+                        "Reason 2: Group chat channels enable all drivers in a region to see shared road alerts simultaneously.",
+                        "Reason 2 Justification: Meaning dispatch staff do not need to compose individual messages to every driver."
+                    ],
+                    doNotAccept: "Do not accept 'it is cheaper' or confusing communication channels with platforms.",
+                    exemplar: "Firstly, instant messaging provides real-time notifications on mobile devices (1), allowing drivers to be alerted immediately to urgent route changes while on the road (1).\nSecondly, group communication channels allow broadcast messages to all drivers at once (1), which saves dispatch staff time compared to emailing individuals (1)."
+                }
+            },
+            {
+                id: "jan2025-q3a",
+                paper: "Jan-2025",
+                questionNumber: "3(a)",
+                marks: 3,
+                commandWord: "explain",
+                topic: "Project Planning",
+                scenario: "A project manager is using a Gantt chart to plan the deployment of a new school library booking system.",
+                question: "Explain one benefit of using a Gantt chart to manage project task dependencies.",
+                visualType: "GANTT",
+                visualData: {
+                    title: "Library System Gantt Chart",
+                    tasks: [
+                        { id: "T1", name: "Requirements Gathering", month: "Jan", duration: "2 Wks" },
+                        { id: "T2", name: "Database Design", month: "Feb", duration: "3 Wks" },
+                        { id: "T3", name: "System Testing", month: "Mar", duration: "2 Wks" }
+                    ]
+                },
+                markScheme: {
+                    acceptablePoints: [
+                        "Point: Clearly shows task order and dependent tasks (which tasks rely on others finishing).",
+                        "Explanation 1: Allowing managers to identify critical path delays before they impact deadlines.",
+                        "Explanation 2: Ensuring resources and staff are allocated efficiently without idle time."
+                    ],
+                    doNotAccept: "Do not accept general statements like 'it organizes tasks' without mentioning order, duration, or dependencies.",
+                    exemplar: "A Gantt chart clearly displays task dependencies visually (1). This allows project managers to see which tasks must be completed before others can start (1), preventing project bottlenecks and ensuring deadlines are met (1)."
+                }
+            },
+
+            // ==================== JUNE 2024 PAPER ====================
+            {
+                id: "june2024-q1a",
+                paper: "June-2024",
+                questionNumber: "1(a)",
+                marks: 2,
+                commandWord: "identify",
+                topic: "Security & Threats",
+                scenario: "Pearls of Wisdom is a dental surgery. It stores personal data about its patients and their treatments. A data breach would impact on the dental surgery. One possible impact could be financial loss.",
+                question: "Give two other possible impacts on the dental surgery of a data breach.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Damage to public image / reputation.",
+                        "Loss of patients / customers.",
+                        "Data loss / corruption.",
+                        "System downtime / operational disruption.",
+                        "Legal action / fines / being sued (GDPR penalties)."
+                    ],
+                    doNotAccept: "Do NOT accept 'financial loss' as it is already explicitly stated in the question text.",
+                    exemplar: "1. Damage to public image and loss of patient trust (1).\n2. Legal action and heavy fines from regulatory authorities for data protection breaches (1)."
+                }
+            },
+            {
+                id: "june2024-q1b",
+                paper: "June-2024",
+                questionNumber: "1(b)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "Each staff member at Pearls of Wisdom uses a password to access the computer system. One way to ensure their password is strong is to use numbers, symbols and characters because they do not make a real word.",
+                question: "Explain one other way staff can ensure their password is strong.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Avoid names/personal info (1) as these are easily guessed by attackers (1).",
+                        "Avoid sequential numbers/letters (e.g. 1234, abcd) (1) as it makes it easier to brute force (1).",
+                        "Use a mix of uppercase and lowercase letters (1) as it increases password complexity and entropy (1).",
+                        "Enforce a minimum password length (e.g., 12+ chars) (1) as longer passwords require exponentially more time to crack (1).",
+                        "Use a password strength checker (1) which provides feedback on vulnerability (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'using numbers, symbols, characters or not using dictionary words' as this is stated in the question prompt.",
+                    exemplar: "Staff can enforce a minimum length of at least 12 characters (1) because longer passwords exponentially increase the time required for hackers to crack them using brute-force tools (1)."
+                }
+            },
+            {
+                id: "june2024-q1c",
+                paper: "June-2024",
+                questionNumber: "1(c)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "The dental surgery uses two-factor authentication (2FA). After staff enter their username and password, they must provide another form of identification.",
+                question: "Explain one way two-factor authentication will check their identity.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "By asking security questions (1) because only authorized staff would know something personal to them (1).",
+                        "By sending an OTP/verification code to a mobile phone or email (1) as this is something the physical staff member possesses (1).",
+                        "By using biometric verification (e.g. fingerprint scan) (1) as it checks physical biological traits matching stored data (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'sending a code' on its own without explaining ownership/possession factor.",
+                    exemplar: "The system sends a single-use verification code to the employee's registered mobile device (1), verifying identity by proving they physically possess that specific device (1)."
+                }
+            },
+            {
+                id: "june2024-q1d",
+                paper: "June-2024",
+                questionNumber: "1(d)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Communication",
+                scenario: "Pearls of Wisdom sends emails to its patients to remind them that they are due to visit the dentist. One benefit of using email is that the surgery can send the same email to multiple patients at once.",
+                question: "Explain one other benefit for the dental surgery of using emails.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Faster delivery than physical post (1) as traditional mail takes days whereas emails arrive instantaneously (1).",
+                        "Cost-effective (1) because the surgery only needs an internet connection and avoids printing/postage fees (1).",
+                        "Digital paper trail / automated logging (1) so staff can easily audit prior communication history (1).",
+                        "Ability to attach documents/x-rays (1) removing the need to print and mail medical files (1).",
+                        "Use BCC function (1) which keeps patient email addresses private and compliant with GDPR (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'free', 'CC', 'saves time', 'multiple people at once', or 'quicker/faster' on its own.",
+                    exemplar: "Emails are far more cost-effective than physical letters (1) because the surgery eliminates paper, printing, and postage costs, only requiring an active internet connection (1)."
+                }
+            },
+            {
+                id: "june2024-q1e",
+                paper: "June-2024",
+                questionNumber: "1(e)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Legal & Ethical",
+                scenario: "The dental surgery is thinking of replacing its current computer system.",
+                question: "Explain two environmental issues this may cause.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Toxic waste / e-waste pollution (1) as hazardous chemicals from discarded PC components leach into surrounding soil and water (1).",
+                        "Increased carbon emissions / greenhouse gases (1) generated during manufacturing and transport of new hardware (1).",
+                        "Ecosystem damage (1) caused by the destructive mining of raw metals and rare elements needed for new hardware (1).",
+                        "Landfill accumulation (1) leading to long-term environmental degradation as non-biodegradable plastics persist (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'landfill' twice. Explanations must clearly link the action to the environmental consequence.",
+                    exemplar: "1. Disposing of old hardware generates toxic electronic waste (1), which can release hazardous chemicals into the soil and local water systems if improperly dumped in landfills (1).\n2. Manufacturing new computer equipment burns fossil fuels (1), releasing high levels of carbon emissions that contribute to global climate change (1)."
+                }
+            },
+            {
+                id: "june2024-q2a",
+                paper: "June-2024",
+                questionNumber: "2(a)",
+                marks: 2,
+                commandWord: "identify",
+                topic: "Project Planning",
+                scenario: "Dig My Duds is a UK-based fair trade online clothing company. It buys clothing from ethical factories worldwide. The company uses a scheduling tool to create 'to-do' lists.",
+                question: "Give two other ways the company could use a scheduling tool.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Create and manage project deadlines.",
+                        "Book and schedule appointments / meetings.",
+                        "Set up recurring calendar activities.",
+                        "Set automated notifications / reminders for milestones.",
+                        "Allocate staff to specific shifts or tasks.",
+                        "Organize shipment and delivery dates with overseas factories."
+                    ],
+                    doNotAccept: "Do NOT accept 'to-do lists' as this is stated in the question.",
+                    exemplar: "1. Scheduling automated reminders for staff prior to critical deadlines (1).\n2. Allocating staff members to specific daily tasks and tracking project milestones (1)."
+                }
+            },
+            {
+                id: "june2024-q2b",
+                paper: "June-2024",
+                questionNumber: "2(b)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Modern Technologies",
+                scenario: "The staff at Dig My Duds work remotely from home.",
+                question: "Explain one benefit for the company of its staff working from home.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Reduced overhead costs (1) as the company saves money on office rent, electricity, and hardware utilities (1).",
+                        "Ability to recruit globally (1) giving access to a wider pool of skilled candidates regardless of geographical location (1).",
+                        "Lower absenteeism/sick leave (1) as staff are able to work comfortably around minor illnesses or home commitments (1).",
+                        "Higher staff productivity and retention (1) leading to increased output and profit margins (1)."
+                    ],
+                    doNotAccept: "Do NOT accept benefits that apply ONLY to the staff member (e.g. 'no commute time'). Must be a benefit to the COMPANY.",
+                    exemplar: "The company experiences substantial cost savings (1) because they do not need to lease physical office premises or pay for building utility bills (1)."
+                }
+            },
+            {
+                id: "june2024-q2c",
+                paper: "June-2024",
+                questionNumber: "2(c)",
+                marks: 4,
+                commandWord: "describe",
+                topic: "UI & Forms",
+                scenario: "Dig My Duds has an online order form on its website that customers use to purchase products.",
+                question: "Identify and describe four layout improvements that could be made to the order form to make it more user friendly.",
+                visualType: "FORM",
+                visualData: {
+                    title: "Dig My Duds Order Checkout Form",
+                    fields: ["Full Name (Unlabelled text box)", "Card Number (Tiny box)", "Address Field (Misaligned)"],
+                    button: "small submit"
+                },
+                markScheme: {
+                    acceptablePoints: [
+                        "Form title needs to be larger and placed prominently at the top to establish clear visual hierarchy.",
+                        "Increase font size and use readable sans-serif fonts to improve legibility.",
+                        "Align form fields and input text boxes consistently for a structured, clean grid layout.",
+                        "Enlarge the submit button and use high-contrast color styling so it stands out clearly.",
+                        "Add explicit field labels and placeholder instructions to guide user input accurately."
+                    ],
+                    doNotAccept: "Do NOT allow generic responses like 'change font' or 'make it pretty' without clear UI context.",
+                    exemplar: "1. Make the form header title larger and centered to clearly identify the page purpose (1).\n2. Increase contrast and size of the submit button so users know where to click (1).\n3. Align text fields evenly to create a organized visual flow (1).\n4. Add clear label descriptors adjacent to all input fields (1)."
+                }
+            },
+            {
+                id: "june2024-q2d",
+                paper: "June-2024",
+                questionNumber: "2(d)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Modern Technologies",
+                scenario: "Staff at Dig My Duds work collaboratively using cloud computing platforms.",
+                question: "Explain two ways cloud computing helps the staff to work collaboratively.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Simultaneous co-authoring (1) so multiple staff members can edit the same document in real-time (1).",
+                        "Centralized real-time synchronization (1) ensuring everyone works on the latest single source of truth version (1).",
+                        "Built-in version control (1) preventing duplicate conflicting copies from being created by team members (1).",
+                        "Ubiquitous remote access (1) enabling collaboration anywhere with an active internet connection (1).",
+                        "Integrated communication/file sharing tools (1) facilitating instant feedback without email attachment clutter (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'Wi-Fi' in place of 'internet'. Do not accept 'quicker or easier' without explicit explanation.",
+                    exemplar: "1. Multiple employees can work on the exact same document simultaneously (1), allowing live updates to be seen in real time by all team members (1).\n2. Automatic cloud file synchronization ensures version control (1), preventing staff from working on outdated local copies (1)."
+                }
+            },
+            {
+                id: "june2024-q3a",
+                paper: "June-2024",
+                questionNumber: "3(a)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "Turbo Rally Parts manufactures and supplies parts for high-performance rally cars.",
+                question: "Explain one way Turbo Rally Parts could use software to protect its business data.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Encryption software (1) which scrambles data into ciphertext so unauthorized interceptors cannot read it (1).",
+                        "Firewall protection (1) which filters incoming and outgoing network traffic to block unauthorized connection requests (1).",
+                        "Antivirus/anti-malware software (1) which scans, detects, quarantines, and removes malicious code (1).",
+                        "Virtual Private Network (VPN) (1) which establishes an encrypted tunnel for secure remote data transmission (1)."
+                    ],
+                    doNotAccept: "Do NOT give marks for generic answers like 'install software' without naming software mechanisms.",
+                    exemplar: "The business can install firewall software (1) which actively monitors network traffic and blocks unauthorized external connection attempts from breaching their database (1)."
+                }
+            },
+            {
+                id: "june2024-q3b",
+                paper: "June-2024",
+                questionNumber: "3(b)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "Staff at Turbo Rally Parts are strictly prohibited from using company computers for personal activities.",
+                question: "Explain two ways the company can monitor staff use of company computers.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Web filtering and keyword detection software (1) to flag and record unauthorized web domain access (1).",
+                        "Network traffic and browser history monitoring logs (1) to track individual bandwidth usage and browsing habits (1).",
+                        "User access and event logging (1) to record exact timestamps, login durations, and application executions (1).",
+                        "Real-time screen desktop monitoring / surveillance software (1) allowing managers to view active employee screens (1).",
+                        "Automated drive scanning (1) to search local storage folders for personal media or non-work files (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'blocking websites' — blocking is prevention, not monitoring.",
+                    exemplar: "1. Installing employee monitoring software (1) which logs all application usage and records real-time screen activity (1).\n2. Reviewing web traffic and access logs (1) to audit websites visited during work hours and flag personal browsing (1)."
+                }
+            },
+            {
+                id: "june2024-q3c",
+                paper: "June-2024",
+                questionNumber: "3(c)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "Turbo Rally Parts has a disaster recovery policy outlining actions to take following a cyber attack. Investigate and Manage are two mandatory stages.",
+                question: "Explain each of these actions in the disaster recovery plan: (i) Investigate (ii) Manage.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Investigate: Analyze attack vector/type (1) to identify which servers were breached and what data was compromised (1). Determine attack timestamp/duration (1) to establish timeline.",
+                        "Manage: Contain and isolate affected systems immediately (1) by disconnecting infected networks so the attack cannot spread (1). Preserve forensic logs/evidence (1) for investigation."
+                    ],
+                    doNotAccept: "Do NOT accept 'how' or 'why' actions (these belong to Analysis stage). Do NOT accept explanations referring to system Recovery.",
+                    exemplar: "Investigate: The IT team audits the breach to identify the exact malware type used (1), establishing which files were compromised and how long the attack was active (1).\nManage: Staff immediately isolate infected network segments from the main server (1) to contain the threat and prevent further damage across company systems (1)."
+                }
+            },
+            {
+                id: "june2024-q3d",
+                paper: "June-2024",
+                questionNumber: "3(d)",
+                marks: 6,
+                commandWord: "describe",
+                topic: "Project Planning",
+                scenario: "Turbo Rally Parts process flow:\n1. Customer sends part details to Parts Dept.\n2. Parts Dept sends required materials list to Warehouse.\n3. Parts Dept sends part details to Workshop.\n4. Warehouse sends materials transfer note & materials to Workshop.\n5. Workshop sends job complete sheet to Parts Dept.\n6. Parts Dept sends part collection note to Customer.",
+                question: "Draw an Information Flow Diagram (DFD) showing entities, flows, and data items.",
+                visualType: "DFD",
+                visualData: {
+                    entities: ["Customer", "Parts Dept", "Warehouse", "Workshop"],
+                    flows: [
+                        "1. Part Details (Customer -> Parts Dept)",
+                        "2. Materials List (Parts Dept -> Warehouse)",
+                        "3. Part Details (Parts Dept -> Workshop)",
+                        "4. Materials & Transfer Note (Warehouse -> Workshop)",
+                        "5. Job Complete Sheet (Workshop -> Parts Dept)",
+                        "6. Part Collection Note (Parts Dept -> Customer)"
+                    ]
+                },
+                markScheme: {
+                    acceptablePoints: [
+                        "4 External Entities correctly represented (Customer, Parts Dept, Warehouse, Workshop).",
+                        "6 directional flow arrows correctly pointing between correct entities.",
+                        "Accurate labelling of data/information transferred on each arrow."
+                    ],
+                    doNotAccept: "Do NOT use incorrect flowchart decision symbols. Must follow DFD notation.",
+                    exemplar: "Level 3 Full Marks (5-6 Marks): All 4 entities placed in distinct boxes with 6 correctly directed arrows and accurate data label descriptions mapping the entire scenario logic."
+                }
+            },
+            {
+                id: "june2024-q4a",
+                paper: "June-2024",
+                questionNumber: "4(a)",
+                marks: 3,
+                commandWord: "describe",
+                topic: "Security & Threats",
+                scenario: "Cardboard Cut Out Theatre is a travelling actors company. Actors connect to open public Wi-Fi networks in hotels and venues to access online ticket sales.",
+                question: "Describe a security issue for the company when using open Wi-Fi networks.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Open Wi-Fi networks lack encryption (1) allowing unencrypted traffic to be snooped (1) enabling unauthorized users to steal sensitive login credentials (1).",
+                        "Man-in-the-Middle (MitM) attacks (1) allow hackers to intercept data transfers (1) exploiting credentials for financial fraud (1).",
+                        "Malware injection risks (1) where rogue routers introduce malicious code (1) corrupting system data (1)."
+                    ],
+                    doNotAccept: "Do NOT give marks unless the response links network openness to data interception/malware risks.",
+                    exemplar: "Public Wi-Fi networks are often unencrypted (1), meaning hackers using packet sniffers on the same network can intercept login details (1) and gain unauthorized access to company accounts and financial data (1)."
+                }
+            },
+            {
+                id: "june2024-q4b",
+                paper: "June-2024",
+                questionNumber: "4(b)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "UI & Forms",
+                scenario: "The theatre company website uses cookies.",
+                question: "Explain one benefit to website visitors of using cookies.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Remembers user preferences/login credentials (1) saving time so visitors do not need to re-enter details on repeat visits (1).",
+                        "Provides personalized content/recommendations (1) by tracking previous browsing history and ticket interests (1)."
+                    ],
+                    doNotAccept: "Do NOT accept general terms like 'makes website load faster' without credential/preference context.",
+                    exemplar: "Cookies store customer login credentials and preferences locally (1), eliminating the need for visitors to re-type their account details every time they visit the website (1)."
+                }
+            },
+            {
+                id: "june2024-q4c",
+                paper: "June-2024",
+                questionNumber: "4(c)",
+                marks: 3,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "An actor receives an email with a link asking them to click and verify personal details. They suspect it is phishing.",
+                question: "Explain one other way (besides checking embedded links) the actor could tell if the email is a phishing attempt.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Poor spelling and grammar (1) as professional organizations proofread official correspondence (1) before sending (1).",
+                        "Generic impersonal greeting (e.g. 'Dear Customer') (1) because genuine service providers address account holders by name (1).",
+                        "Suspicious sender email domain address (1) that slightly misspells official domain names (1) when audited carefully (1).",
+                        "Urgent or threatening language demanding immediate action (1) creating panic to bypass critical thinking (1)."
+                    ],
+                    doNotAccept: "Do NOT accept any reference to inspecting hyperlinks or URL links as this is stated in the question.",
+                    exemplar: "Check the email sender's address domain (1). Phishing emails often use deceptive domain names that slightly misspell legitimate company names (1), which can be identified by checking official contact details (1)."
+                }
+            },
+            {
+                id: "june2024-q4d",
+                paper: "June-2024",
+                questionNumber: "4(d)",
+                marks: 6,
+                commandWord: "discuss",
+                topic: "UI & Forms",
+                scenario: "Cardboard Cut Out Theatre uses an online web form to sell performance tickets.",
+                question: "Discuss accessibility features the company could implement on this web form.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Screen reader compatibility / ALT text tags for visually impaired users.",
+                        "High contrast color themes and scalable text/magnifier options for low-vision users.",
+                        "Keyboard-only navigation accessibility (tab indexes) for motor-impaired visitors.",
+                        "Voice input speech-to-text data entry capabilities.",
+                        "Multi-language translation toggles for non-native language speakers.",
+                        "Clear error validation highlights and simple form instructions."
+                    ],
+                    doNotAccept: "Do NOT accept 'changing font size' in isolation as browser zoom handles this — reference web accessibility options.",
+                    exemplar: "Implementing ALT text labels on visual elements and screen reader compatibility ensures visually impaired users can hear form instructions (2).\nAdding keyboard tab-navigation features assists users with motor disabilities who cannot use a mouse (2).\nFurthermore, high-contrast color schemes and voice input features make the form accessible to a broad audience, maximizing ticket sales (2)."
+                }
+            },
+            {
+                id: "june2024-q4e",
+                paper: "June-2024",
+                questionNumber: "4(e)",
+                marks: 6,
+                commandWord: "evaluate",
+                topic: "Legal & Ethical",
+                scenario: "Cardboard Cut Out Theatre collects transactional data (ticket types, purchase times, sales volume, customer locations) to plan future show tours.",
+                question: "Evaluate the use of transactional data for planning future operations.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Benefits: Identifies regional demand patterns, peak ticket purchasing hours, optimized pricing strategies, graphical trend reporting.",
+                        "Drawbacks: Data privacy and GDPR compliance obligations, storage and analytics tool costs, risk of basing decisions on outdated/corrupted data.",
+                        "Conclusion: Fully supported final judgement weighing strategic commercial gains against compliance and security risks."
+                    ],
+                    doNotAccept: "Do NOT give full marks (5-6) unless a clear, fully supported conclusion is included.",
+                    exemplar: "Analyzing transactional data allows the company to identify regional popularity patterns and schedule tour dates in high-demand cities, maximizing venue attendance and revenue (2).\nHowever, storing customer payment data introduces GDPR compliance responsibilities and risks of cyber theft if servers are breached (2).\nIn conclusion, provided strict data encryption and privacy controls are maintained, transactional analytics offer invaluable strategic benefits that outweigh operational risks (2)."
+                }
+            },
+
+            // ==================== JANUARY 2024 PAPER ====================
+            {
+                id: "jan2024-q1a",
+                paper: "Jan-2024",
+                questionNumber: "1(a)",
+                marks: 2,
+                commandWord: "identify",
+                topic: "Modern Technologies",
+                scenario: "A retail business is setting up an official website and digital footprint.",
+                question: "Give two reasons why a business should establish an official website.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "24/7 global availability to customers.",
+                        "Reaches a wider international target market.",
+                        "Establishes a professional corporate brand image.",
+                        "Provides direct platform for customer reviews and feedback.",
+                        "Enables direct online promotional offers and voucher distribution.",
+                        "Gathers customer telemetry and web traffic analytics."
+                    ],
+                    doNotAccept: "Do NOT accept 'advertisements' or general 'advertising'.",
+                    exemplar: "1. Allows the business to sell products 24/7 to a global customer base (1).\n2. Tracks web analytics to gather consumer demographics (1)."
+                }
+            },
+            {
+                id: "jan2024-q1b",
+                paper: "Jan-2024",
+                questionNumber: "1(b)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "UI & Forms",
+                scenario: "Websites must cater to diverse user needs.",
+                question: "Explain one web accessibility feature that aids visually impaired users.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Magnifier / screen zoom (1) so text and graphic content can be enlarged for readability (1).",
+                        "Text-to-speech / screen reader narration (1) so site content can be converted into audio output (1).",
+                        "ALT text image descriptions (1) so screen readers can explain graphical content (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'increase font size' on its own without specifying text and graphics zoom.",
+                    exemplar: "Include screen reader text-to-speech software compatibility (1) so visually impaired users can have written page content and image descriptions read aloud to them (1)."
+                }
+            },
+            {
+                id: "jan2024-q1c",
+                paper: "Jan-2024",
+                questionNumber: "1(c)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Modern Technologies",
+                scenario: "Remote delivery staff frequently travel through rural countryside areas.",
+                question: "Explain one reason why mobile network connection drops in rural areas.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Fewer cellular phone towers / sparse infrastructure (1) leading to broad dead-zones with weak signal reach (1).",
+                        "Physical terrain obstacles (mountains, dense trees, valleys) (1) which block radio signal waves (1).",
+                        "Electrical or atmospheric interference (1) causing temporary connection dropouts (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'dead battery', 'no phone data', or 'damaged phone'.",
+                    exemplar: "Rural locations have fewer cell phone towers (1), resulting in low signal coverage and dropped network connections in remote geographic areas (1)."
+                }
+            },
+            {
+                id: "jan2024-q1d",
+                paper: "Jan-2024",
+                questionNumber: "1(d)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "An organization's network is targeted by unauthorized external hackers.",
+                question: "Explain one motivation behind cyber security attacks.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Financial gain (1) by stealing banking data or demanding ransom payments (1).",
+                        "Industrial espionage (1) to steal trade secrets or intellectual property from competitors (1).",
+                        "Disruption / hacktivism (1) to cause operational downtime and damage corporate reputation (1).",
+                        "Personal grudge / internal revenge (1) by disgruntled former employees seeking damage (1)."
+                    ],
+                    doNotAccept: "Do NOT accept generic answers without explaining the underlying motive.",
+                    exemplar: "Hackers may seek financial gain (1) by stealing confidential credit card records to sell on black markets or extorting ransom payments (1)."
+                }
+            },
+            {
+                id: "jan2024-q1e",
+                paper: "Jan-2024",
+                questionNumber: "1(e)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "An organization needs to secure both its physical server room and its digital systems.",
+                question: "Explain two methods to restrict unauthorized access to company systems.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Physical security barriers (keycards, biometric locks, PIN pads) (1) stopping unauthorized physical entry to server rooms (1).",
+                        "Strong password policies (1) ensuring only authenticated users can log in (1).",
+                        "Role-Based Access Control (RBAC) (1) restricting file access permissions according to job roles (1).",
+                        "Two-Factor Authentication (2FA) (1) requiring secondary device verification (1)."
+                    ],
+                    doNotAccept: "Do NOT award 'authorized users' mark twice.",
+                    exemplar: "1. Installing biometric door locks on server rooms (1) preventing physical access unless a valid fingerprint matches stored records (1).\n2. Enforcing Role-Based Access Controls (1) so staff can only access folders required for their specific job role (1)."
+                }
+            },
+            {
+                id: "jan2024-q2a",
+                paper: "Jan-2024",
+                questionNumber: "2(a)",
+                marks: 2,
+                commandWord: "identify",
+                topic: "Legal & Ethical",
+                scenario: "Businesses collecting customer records must comply with Data Protection legislation (GDPR).",
+                question: "Identify two principles of Data Protection law.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Lawful, fair, and transparent processing.",
+                        "Collected only for specified, explicit, and legitimate purposes.",
+                        "Data minimization (only adequate and necessary data collected).",
+                        "Accuracy and keeping records up to date.",
+                        "Storage limitation (kept no longer than necessary).",
+                        "Integrity and confidentiality (protected against unauthorized access)."
+                    ],
+                    doNotAccept: "Do NOT give marks for vague statements like 'keep data safe' without legislative principle context.",
+                    exemplar: "1. Personal data must be kept accurate and updated (1).\n2. Data must only be retained for as long as strictly necessary (1)."
+                }
+            },
+            {
+                id: "jan2024-q2b",
+                paper: "Jan-2024",
+                questionNumber: "2(b)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Legal & Ethical",
+                scenario: "Diggers is a tech startup developing unique software designs and brand logos.",
+                question: "Explain one way Diggers can protect its intellectual property (IP).",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Copyright (1) prevents unauthorized copying of software code or original designs, enabling legal action (1).",
+                        "Trademark registration (1) legally protects the unique brand logo and name from competitor copycats (1).",
+                        "Patents (1) secure exclusive rights over new technological processes and hardware inventions (1)."
+                    ],
+                    doNotAccept: "Do NOT confuse copyright with patents or trademarks.",
+                    exemplar: "Registering a official trademark (1) legally protects their unique brand name and logo, preventing competitors from copying it (1)."
+                }
+            },
+            {
+                id: "jan2024-q2c",
+                paper: "Jan-2024",
+                questionNumber: "2(c)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Project Planning",
+                scenario: "A manager uses calendar scheduling software to organize team project meetings.",
+                question: "Explain two features of scheduling software that assist meeting setup.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Scheduling Assistant (1) automatically checks attendee availability calendars to find conflict-free slots (1).",
+                        "Automated Reminders (1) notifies attendees prior to the meeting to ensure punctuality (1).",
+                        "Recurring meeting option (1) automatically books weekly or monthly project standups (1).",
+                        "RSVP Response options (1) tracks attendee confirmations and regrets in real time (1)."
+                    ],
+                    doNotAccept: "Only allow recognized scheduling software features.",
+                    exemplar: "1. Scheduling Assistant (1) checks all team members' calendars to find an open time slot when everyone is free (1).\n2. Automated meeting reminders (1) send pop-up alerts to attendees prior to start time to reduce missed meetings (1)."
+                }
+            },
+            {
+                id: "jan2024-q2d",
+                paper: "Jan-2024",
+                questionNumber: "2(d)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Modern Technologies",
+                scenario: "An organization is creating a formal data backup policy.",
+                question: "Explain two components that should be defined in a company backup policy.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Backup Schedule and Frequency (1) defining exact times (e.g. daily at midnight) to ensure minimal data loss (1).",
+                        "Storage Media and Location (1) specifying off-site cloud or immutable drive storage for disaster recovery (1).",
+                        "Designated Personnel (1) assigning explicit responsibility to specific IT officers to ensure compliance (1).",
+                        "Data Restoration Testing (1) conducting periodic test restores to verify file integrity (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'backup files' without explaining the policy parameter.",
+                    exemplar: "1. Backup frequency (1) establishing automated daily backups during off-peak hours so recent data is never lost (1).\n2. Storage location (1) mandating off-site cloud storage so data remains recoverable if physical premises are damaged (1)."
+                }
+            },
+            {
+                id: "jan2024-q3a",
+                paper: "Jan-2024",
+                questionNumber: "3(a)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Communication",
+                scenario: "Staff across multiple regional office branches need to collaborate on urgent project queries.",
+                question: "Explain one benefit of using instant messaging software over physical meetings for regional branches.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Real-time instant communication (1) allowing queries to be resolved immediately without travel downtime (1).",
+                        "Group chat channels (1) enabling entire teams to view shared updates simultaneously (1)."
+                    ],
+                    doNotAccept: "Do NOT accept generic statements like 'it is cheaper' without context.",
+                    exemplar: "Instant messaging provides immediate real-time chat (1), enabling staff at different regional branches to solve issues quickly without spending time traveling (1)."
+                }
+            },
+            {
+                id: "jan2024-q3b",
+                paper: "Jan-2024",
+                questionNumber: "3(b)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "Web browsers routinely store cookies during internet sessions.",
+                question: "Explain two drawbacks of web cookies.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Privacy risks (1) as tracking cookies monitor user browsing behavior and build detailed profile histories (1).",
+                        "Security vulnerabilities (1) because cookies store session data in plain text on hard drives which can be hijacked (1).",
+                        "Storage bloat (1) as accumulated tracking files consume disk storage and degrade browser performance over time (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'malware' as cookies themselves are not malware files.",
+                    exemplar: "1. Privacy concerns (1) because third-party cookies track user activity across multiple websites without explicit awareness (1).\n2. Security risks (1) as session cookies stored locally can be intercepted by hackers to hijack active account logins (1)."
+                }
+            },
+            {
+                id: "jan2024-q3c",
+                paper: "Jan-2024",
+                questionNumber: "3(c)",
+                marks: 4,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "Cyber criminals utilize various social engineering techniques against employees.",
+                question: "Explain two social engineering threats: (i) Pharming (ii) Shoulder Surfing.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Pharming: Malicious code redirects users from legitimate web addresses to fraudulent clone websites (1) to steal login credentials without victim awareness (1).",
+                        "Shoulder Surfing: Direct physical observation (1) where attackers secretly watch employees type passwords or PINs (1)."
+                    ],
+                    doNotAccept: "Do NOT confuse Pharming with Phishing emails.",
+                    exemplar: "Pharming silently redirects website traffic to a fake clone site (1) tricking users into typing credentials into an attacker's database (1).\nShoulder Surfing involves someone physically watching you (1) while you enter passwords or PINs to steal login credentials (1)."
+                }
+            },
+            {
+                id: "jan2024-q3d",
+                paper: "Jan-2024",
+                questionNumber: "3(d)",
+                marks: 6,
+                commandWord: "describe",
+                topic: "Project Planning",
+                scenario: "Recruitment Workflow Logic:\n1. Staff view job requirements.\n2. Staff check candidate pool list.\n3. Staff compare job requirements against candidate list.\n4. Decision: If candidate matches -> send candidate details to hiring company.\n5. Decision: If no match -> post job advert on company website.\n6. Check for additional job openings.",
+                question: "Draw a Flowchart mapping this recruitment decision logic.",
+                visualType: "FLOWCHART",
+                visualData: {
+                    title: "Recruitment Logic Flowchart",
+                    steps: [
+                        "Start -> View Job Requirements",
+                        "Process: Check Candidate List & Compare Requirements",
+                        "Decision Shape: Candidate Match Found? (Yes/No)",
+                        "If Yes -> Send Details to Company",
+                        "If No -> Advertise Job on Website",
+                        "Loop Back -> Check for Remaining Jobs -> End"
+                    ]
+                },
+                markScheme: {
+                    acceptablePoints: [
+                        "Correct use of standard flowchart symbols (Terminators, Process rectangles, Decision diamonds).",
+                        "Valid logical flow lines and arrows (including labeled Yes/No decision branches).",
+                        "Full coverage of scenario steps without logical dead ends."
+                    ],
+                    doNotAccept: "Do NOT omit Yes/No branch labels on decision diamonds.",
+                    exemplar: "Level 3 Full Marks (5-6 Marks): Accurate start/end symbols, decision diamond branching to Yes/No paths, process boxes mapping candidate check and job posting logic."
+                }
+            },
+            {
+                id: "jan2024-q4a",
+                paper: "Jan-2024",
+                questionNumber: "4(a)",
+                marks: 3,
+                commandWord: "describe",
+                topic: "Security & Threats",
+                scenario: "Data is transmitted across private and public networks.",
+                question: "Describe how encryption protects data during transmission.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Plaintext data is converted into scrambled ciphertext (1).",
+                        "Uses a mathematical encryption algorithm (1).",
+                        "Requires a secret decryption key/passphrase (1) to convert ciphertext back into readable format.",
+                        "Interceptors without the key cannot comprehend the scrambled payload (1)."
+                    ],
+                    doNotAccept: "Do NOT state 'encryption blocks hackers' — encryption scrambles data, it does not act as a firewall.",
+                    exemplar: "Encryption uses mathematical algorithms to scramble plain text into unreadable ciphertext (1). If intercepted during transmission, the data cannot be read (1) without the correct secret decryption key (1)."
+                }
+            },
+            {
+                id: "jan2024-q4b",
+                paper: "Jan-2024",
+                questionNumber: "4(b)",
+                marks: 2,
+                commandWord: "explain",
+                topic: "Modern Technologies",
+                scenario: "Organizations store central business documents in cloud storage platforms.",
+                question: "Explain one benefit of cloud storage for business files.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Scalability / elasticity (1) allowing storage capacity to be increased on-demand without purchasing local servers (1).",
+                        "Automatic remote backups (1) ensuring disaster resilience without manual staff intervention (1).",
+                        "Ubiquitous device access (1) enabling staff to access files anytime anywhere with internet (1)."
+                    ],
+                    doNotAccept: "Do NOT accept 'Wi-Fi' in place of 'internet connection'.",
+                    exemplar: "Cloud storage is highly scalable (1) enabling businesses to instantly expand or reduce storage capacity as needed without investing in physical hardware (1)."
+                }
+            },
+            {
+                id: "jan2024-q4c",
+                paper: "Jan-2024",
+                questionNumber: "4(c)",
+                marks: 3,
+                commandWord: "explain",
+                topic: "Security & Threats",
+                scenario: "Employees often use portable USB flash drives to move work files.",
+                question: "Explain one security risk associated with using USB flash drives.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "High loss/theft risk (1) due to small physical footprint (1) leading to sensitive data exposure (1).",
+                        "Malware vector (1) transferring malicious code between unsecured personal PCs and corporate networks (1) causing network infection (1)."
+                    ],
+                    doNotAccept: "Do NOT mix and match unrelated risk explanations.",
+                    exemplar: "USB drives are easily lost or stolen due to their small physical size (1). If unencrypted, lost drives expose sensitive company data to unauthorized individuals (1) creating serious GDPR compliance breaches (1)."
+                }
+            },
+            {
+                id: "jan2024-q4d",
+                paper: "Jan-2024",
+                questionNumber: "4(d)",
+                marks: 6,
+                commandWord: "discuss",
+                topic: "Communication",
+                scenario: "Modern organizations deploy collaborative digital platforms (e.g. cloud docs, video channels, real-time messaging) for remote team projects.",
+                question: "Discuss how collaborative technologies impact team productivity and staff morale.",
+                visualType: null,
+                markScheme: {
+                    acceptablePoints: [
+                        "Productivity gains: Real-time co-authoring, streamlined communication, eliminated travel time, faster problem resolution.",
+                        "Morale & Culture: Reduced isolation for remote staff, equal participation, flexible working options.",
+                        "Potential drawbacks: Digital fatigue, constant notification interruptions, blurring of work-life boundaries.",
+                        "Balanced discussion weighing productivity benefits against digital overload."
+                    ],
+                    doNotAccept: "Do NOT provide generic statements without discussing team dynamic interactions.",
+                    exemplar: "Collaborative technologies boost team productivity by allowing simultaneous file co-authoring and instant message updates, eliminating delays associated with back-and-forth emails (2).\nRemote workers feel more connected and included in team culture, improving overall staff morale and work flexibility (2).\nHowever, constant messaging alerts can cause digital burnout and distractions, so clear communication boundaries must be enforced (2)."
+                }
+            }
+        ];
+
+        let activeQuestion = examQuestions[0];
+        let currentFilterMarks = "ALL";
+        let currentFilterPaper = "ALL";
+        let currentFilterTopic = "ALL";
+        let currentSelectedMarks = [];
+        let userStats = { attemptedCount: 0, totalScore: 0, totalMax: 0 };
+        let isTeacherMode = false;
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            applyFilters();
+            loadQuestion(examQuestions[0].id);
+
+            // Character Counter Event
+            document.getElementById('studentAnswer').addEventListener('input', (e) => {
+                document.getElementById('charCounter').innerText = `${e.target.value.length} characters`;
+            });
+        });
+
+        function getCommandWordTip(question) {
+            if (!question) return COMMAND_WORD_TIPS.describe;
+            
+            if (question.commandWord && COMMAND_WORD_TIPS[question.commandWord.toLowerCase()]) {
+                return COMMAND_WORD_TIPS[question.commandWord.toLowerCase()];
+            }
+
+            const qText = (question.question || '').toLowerCase();
+            
+            if (qText.startsWith('identify') || qText.startsWith('state') || qText.startsWith('name') || qText.startsWith('give')) {
+                return COMMAND_WORD_TIPS.identify;
+            }
+            if (qText.startsWith('describe')) {
+                return COMMAND_WORD_TIPS.describe;
+            }
+            if (qText.startsWith('explain')) {
+                return COMMAND_WORD_TIPS.explain;
+            }
+            if (qText.startsWith('discuss')) {
+                return COMMAND_WORD_TIPS.discuss;
+            }
+            if (qText.startsWith('evaluate')) {
+                return COMMAND_WORD_TIPS.evaluate;
+            }
+
+            return COMMAND_WORD_TIPS.describe;
+        }
+
+        function renderAnswerBoxTip(question) {
+            const tipContainer = document.getElementById('answer-box-tip');
+            if (!tipContainer) return;
+
+            const tipData = getCommandWordTip(question);
+
+            tipContainer.innerHTML = `
+                <div class="p-3 my-2 rounded-xl border border-cyan-200 bg-cyan-50/50 text-xs text-slate-700">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${tipData.badgeClass}">
+                            ${tipData.title} Question
+                        </span>
+                    </div>
+                    <p class="leading-relaxed">${tipData.tip}</p>
+                </div>
+            `;
+        }
+
+        function setMarkFilter(markVal) {
+            currentFilterMarks = markVal;
+            
+            const btns = document.querySelectorAll('.mark-filter-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('active', 'bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+
+            if (event && event.target) {
+                event.target.classList.add('active', 'bg-slate-900', 'text-white');
+                event.target.classList.remove('bg-slate-100', 'text-slate-700');
+            }
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            currentFilterPaper = document.getElementById('paperSelect').value;
+            currentFilterTopic = document.getElementById('topicSelect').value;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            const filteredList = examQuestions.filter(q => {
+                const matchMarks = (currentFilterMarks === "ALL") || (q.marks === parseInt(currentFilterMarks));
+                const matchPaper = (currentFilterPaper === "ALL") || (q.paper === currentFilterPaper);
+                const matchTopic = (currentFilterTopic === "ALL") || (q.topic === currentFilterTopic);
+                const matchSearch = q.scenario.toLowerCase().includes(searchVal) || 
+                                    q.question.toLowerCase().includes(searchVal) || 
+                                    q.questionNumber.toLowerCase().includes(searchVal);
+                return matchMarks && matchPaper && matchTopic && matchSearch;
+            });
+
+            renderQuestionList(filteredList);
+        }
+
+        function renderQuestionList(questions) {
+            const listContainer = document.getElementById('questionsList');
+            const countBadge = document.getElementById('questionCountBadge');
+            countBadge.innerText = questions.length;
+
+            if (questions.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-10 text-slate-400 text-xs">
+                        <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
+                        No questions match your current filters.
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = questions.map(q => {
+                const isActive = activeQuestion && q.id === activeQuestion.id;
+                return `
+                    <div onclick="loadQuestion('${q.id}')" class="cursor-pointer p-3 rounded-xl border transition ${isActive ? 'bg-cyan-50/80 border-cyan-500 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'}">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-bold text-xs ${isActive ? 'text-cyan-900' : 'text-slate-800'}">
+                                ${q.paper} - Q${q.questionNumber}
+                            </span>
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${q.marks === 6 ? 'bg-purple-100 text-purple-800' : q.marks >= 4 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                                ${q.marks} MARKS
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 line-clamp-2 leading-tight">
+                            ${q.question}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadQuestion(qId) {
+            const q = examQuestions.find(item => item.id === qId);
+            if (!q) return;
+
+            activeQuestion = q;
+            applyFilters(); // Highlight selected in list
+
+            // Populate view elements
+            document.getElementById('qPaperBadge').innerText = q.paper === 'Jan-2025' ? 'Jan 2025 Paper' : q.paper === 'June-2024' ? 'June 2024 Paper' : 'Jan 2024 Paper';
+            document.getElementById('qNumBadge').innerText = `Question ${q.questionNumber}`;
+            document.getElementById('qTopicBadge').innerText = q.topic;
+            document.getElementById('qMarksBadge').innerText = `${q.marks} MARKS`;
+            document.getElementById('scenarioText').innerText = q.scenario;
+            document.getElementById('questionText').innerText = q.question;
+            document.getElementById('studentAnswer').value = '';
+            document.getElementById('charCounter').innerText = '0 characters';
+            document.getElementById('feedbackCard').classList.add('hidden');
+
+            renderAnswerBoxTip(q);
+
+            // Set Writing Tip dynamically based on command word AND mark tariff
+            const tipEl = document.getElementById('writingTip');
+            tipEl.innerHTML = getWritingTip(q);
+
+            // Visual Aid check
+            const visualContainer = document.getElementById('visualAidContainer');
+            if (q.visualType) {
+                visualContainer.classList.remove('hidden');
+                document.getElementById('visualTypeLabel').innerText = q.visualType === 'DFD' ? 'Data Flow Diagram' : q.visualType === 'GANTT' ? 'Gantt Project Chart' : q.visualType === 'FLOWCHART' ? 'Process Flowchart' : 'UI Form Layout';
+                renderVisualAid(q);
+            } else {
+                visualContainer.classList.add('hidden');
+            }
+
+            // Set Exemplar text
+            document.getElementById('exemplarText').innerText = q.markScheme.exemplar;
+            document.getElementById('exemplarContent').classList.add('hidden');
+
+            // Handle Do Not Accept text
+            const doNotAcceptBox = document.getElementById('doNotAcceptContainer');
+            if (q.markScheme.doNotAccept) {
+                doNotAcceptBox.classList.remove('hidden');
+                document.getElementById('doNotAcceptText').innerText = q.markScheme.doNotAccept;
+            } else {
+                doNotAcceptBox.classList.add('hidden');
+            }
+        }
+
+        function renderVisualAid(q) {
+            const visualContent = document.getElementById('visualAidContent');
+            if (q.visualType === 'GANTT') {
+                visualContent.innerHTML = `
+                    <div class="w-full text-xs font-mono text-slate-200 p-2">
+                        <div class="font-bold text-cyan-400 mb-2 border-b border-slate-800 pb-1">${q.visualData.title}</div>
+                        <div class="grid grid-cols-12 gap-1 text-[10px] bg-slate-900 p-1 rounded font-bold mb-1 text-slate-400">
+                            <span class="col-span-1">No.</span>
+                            <span class="col-span-5">Task Name</span>
+                            <span class="col-span-3">Month</span>
+                            <span class="col-span-3">Duration</span>
+                        </div>
+                        ${q.visualData.tasks.map(t => `
+                            <div class="grid grid-cols-12 gap-1 text-[11px] py-1 border-b border-slate-900/50">
+                                <span class="col-span-1 text-cyan-400">${t.id}</span>
+                                <span class="col-span-5 font-sans">${t.name}</span>
+                                <span class="col-span-3 text-amber-300">${t.month}</span>
+                                <span class="col-span-3 text-emerald-300">${t.duration}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (q.visualType === 'FORM') {
+                visualContent.innerHTML = `
+                    <div class="w-full max-w-xs bg-slate-900 border border-slate-700 p-3 rounded-lg text-slate-200 text-xs">
+                        <div class="font-bold text-center text-slate-400 mb-2">${q.visualData.title}</div>
+                        ${q.visualData.fields.map(f => `
+                            <div class="mb-2">
+                                <label class="block text-[10px] text-slate-400">${f}</label>
+                                <div class="w-full h-6 bg-slate-800 border border-slate-700 rounded mt-0.5"></div>
+                            </div>
+                        `).join('')}
+                        <button class="w-full bg-slate-800 text-slate-300 text-[10px] font-bold py-1.5 rounded mt-2 uppercase tracking-wider">${q.visualData.button}</button>
+                    </div>
+                `;
+            } else if (q.visualType === 'DFD') {
+                visualContent.innerHTML = `
+                    <div class="w-full text-xs text-slate-200 p-2">
+                        <div class="font-bold text-cyan-400 mb-2 border-b border-slate-800 pb-1">Data Flow Diagram (DFD) Entities & Data Flows</div>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            ${q.visualData.entities.map(e => `
+                                <span class="px-2.5 py-1 bg-slate-800 border border-cyan-500/40 rounded text-cyan-300 font-mono text-[11px]"><i class="fa-solid fa-cube mr-1"></i>${e}</span>
+                            `).join('')}
+                        </div>
+                        <div class="space-y-1 bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px]">
+                            ${q.visualData.flows.map(f => `
+                                <div class="text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-arrow-right text-cyan-400 text-[10px]"></i> ${f}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (q.visualType === 'FLOWCHART') {
+                visualContent.innerHTML = `
+                    <div class="w-full text-xs text-slate-200 p-2">
+                        <div class="font-bold text-amber-400 mb-2 border-b border-slate-800 pb-1">${q.visualData.title}</div>
+                        <div class="space-y-1.5 bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] font-mono">
+                            ${q.visualData.steps.map(s => `
+                                <div class="text-slate-300 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500"></span> ${s}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function clearAnswer() {
+            document.getElementById('studentAnswer').value = '';
+            document.getElementById('charCounter').innerText = '0 characters';
+        }
+
+        function toggleExemplar() {
+            const content = document.getElementById('exemplarContent');
+            const chevron = document.getElementById('exemplarChevron');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                content.classList.add('hidden');
+                chevron.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+
+        function evaluateAnswer() {
+            const studentText = document.getElementById('studentAnswer').value.trim();
+            if (!studentText) {
+                const aiComment = document.getElementById('aiFeedbackComment');
+                const feedbackCard = document.getElementById('feedbackCard');
+                feedbackCard.classList.remove('hidden');
+                aiComment.innerText = "Please write a response before evaluating!";
+                return;
+            }
+
+            const result = performClientSideMarking(activeQuestion, studentText);
+            displaySelfAssessmentResult(result, studentText);
+            
+            const exemplarContent = document.getElementById('exemplarContent');
+            if (exemplarContent.classList.contains('hidden')) {
+                toggleExemplar();
+            }
+        }
+
+        function performClientSideMarking(q, answer) {
+            const lowerAnswer = answer.toLowerCase();
+            const pointsMatched = [];
+            let autoDetectedMarks = 0;
+
+            q.markScheme.acceptablePoints.forEach((pt, idx) => {
+                const ignoreWords = ['and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'because', 'so', 'that', 'this'];
+                const words = pt.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(w => w.length > 3 && !ignoreWords.includes(w));
+                
+                const matchedWords = words.filter(kw => lowerAnswer.includes(kw));
+                const isMatch = (words.length > 0 && matchedWords.length >= Math.min(2, words.length));
+                
+                if (isMatch && autoDetectedMarks < q.marks) {
+                    autoDetectedMarks++;
+                }
+
+                pointsMatched.push({
+                    id: idx,
+                    point: pt,
+                    autoMatched: isMatch
+                });
+            });
+
+            let commentary = `Keyword scanner detected ${autoDetectedMarks} potential mark point(s) in your answer. Compare your points with the checklist below.`;
+
+            return {
+                autoScore: autoDetectedMarks,
+                commentary: commentary,
+                pointsMatched: pointsMatched
+            };
+        }
+
+        function displaySelfAssessmentResult(result, studentText) {
+            const feedbackCard = document.getElementById('feedbackCard');
+            const aiComment = document.getElementById('aiFeedbackComment');
+            const criteriaList = document.getElementById('criteriaMatchList');
+
+            feedbackCard.classList.remove('hidden');
+            aiComment.innerText = result.commentary;
+
+            currentSelectedMarks = result.pointsMatched.map(p => p.autoMatched);
+
+            criteriaList.innerHTML = result.pointsMatched.map((item, idx) => `
+                <label class="flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition ${currentSelectedMarks[idx] ? 'bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                    <input type="checkbox" onchange="toggleCriteriaCheck(${idx})" ${currentSelectedMarks[idx] ? 'checked' : ''} class="mt-0.5 h-4 w-4 text-cyan-600 rounded border-slate-300 focus:ring-cyan-500">
+                    <div class="flex-grow">
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold leading-snug">${item.point}</span>
+                            ${item.autoMatched ? '<span class="text-[10px] bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded font-bold ml-2">Detected</span>' : ''}
+                        </div>
+                    </div>
+                </label>
+            `).join('');
+
+            recalculateSelfScore();
+            feedbackCard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleCriteriaCheck(index) {
+            currentSelectedMarks[index] = !currentSelectedMarks[index];
+            
+            const criteriaList = document.getElementById('criteriaMatchList');
+            const labels = criteriaList.querySelectorAll('label');
+            if (labels[index]) {
+                if (currentSelectedMarks[index]) {
+                    labels[index].className = "flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm";
+                } else {
+                    labels[index].className = "flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100";
+                }
+            }
+
+            recalculateSelfScore();
+        }
+
+        function recalculateSelfScore() {
+            const rawScore = currentSelectedMarks.filter(Boolean).length;
+            const finalScore = Math.min(rawScore, activeQuestion.marks);
+
+            document.getElementById('awardedScore').innerText = `${finalScore} / ${activeQuestion.marks}`;
+
+            const scoreBadgeIcon = document.getElementById('scoreBadgeIcon');
+            const pct = (finalScore / activeQuestion.marks) * 100;
+            if (pct >= 80) {
+                scoreBadgeIcon.className = "w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm";
+                scoreBadgeIcon.innerHTML = `<i class="fa-solid fa-check"></i>`;
+            } else if (pct >= 40) {
+                scoreBadgeIcon.className = "w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm";
+                scoreBadgeIcon.innerHTML = `<i class="fa-solid fa-minus"></i>`;
+            } else {
+                scoreBadgeIcon.className = "w-8 h-8 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm";
+                scoreBadgeIcon.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
+            }
+
+            userStats.attemptedCount = Math.max(userStats.attemptedCount, 1);
+            userStats.totalScore = finalScore;
+            userStats.totalMax = activeQuestion.marks;
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            document.getElementById('statAttempted').innerText = userStats.attemptedCount;
+            const avg = userStats.totalMax > 0 ? Math.round((userStats.totalScore / userStats.totalMax) * 100) : 0;
+            document.getElementById('statAvgScore').innerText = `${avg}%`;
+        }
+
+        function toggleTeacherMode() {
+            isTeacherMode = !isTeacherMode;
+            const btnText = document.getElementById('modeBtnText');
+            const teacherControls = document.getElementById('teacherDirectControls');
+
+            if (isTeacherMode) {
+                btnText.innerText = "Teacher Mode: ON";
+                teacherControls.classList.remove('hidden');
+                document.getElementById('toggleModeBtn').classList.add('bg-amber-600', 'text-white');
+                document.getElementById('toggleModeBtn').classList.remove('bg-slate-800', 'text-slate-200');
+            } else {
+                btnText.innerText = "Teacher Mode: OFF";
+                teacherControls.classList.add('hidden');
+                document.getElementById('toggleModeBtn').classList.remove('bg-amber-600', 'text-white');
+                document.getElementById('toggleModeBtn').classList.add('bg-slate-800', 'text-slate-200');
+            }
+        }
+
+        function revealTeacherMarkScheme() {
+            const studentText = document.getElementById('studentAnswer').value || "[Teacher Mode View]";
+            const result = performClientSideMarking(activeQuestion, studentText);
+            result.pointsMatched.forEach(p => p.autoMatched = true);
+            displaySelfAssessmentResult(result, studentText);
+            toggleExemplar();
+        }
+    </script>
+</body>
+</html>
